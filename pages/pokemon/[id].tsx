@@ -2,7 +2,10 @@ import { Layout } from '../../components/layouts'
 import { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import { pokeApi } from '@/api';
 import { Pokemon } from '../../interfaces/pokemon-full';
-import { Button, Card, Container, Grid, Text,Image } from '@nextui-org/react';
+import { Button, Card, Container, Grid, Text, Image } from '@nextui-org/react';
+import { localFavorites } from '../../utils';
+import { useState } from 'react';
+import confetti from 'canvas-confetti';
 
 
 interface Props {
@@ -12,9 +15,27 @@ interface Props {
 
 export const PokemonPage: NextPage<Props> = ({ pokemon }) => {
 
+    const [isInFavorites, setisInFavorites] = useState(localFavorites.existPokemonInFavorites(pokemon.id));
+
+    const onToggleFavorite = () => {
+        localFavorites.toggleFavorite(pokemon.id);
+        setisInFavorites(!isInFavorites);
+        if (isInFavorites) return;
+        confetti({
+            zIndex: 999,
+            particleCount: 100,
+            spread: 160,
+            angle: -100,
+            origin: {
+                x: 1,
+                y: 0,
+            }
+        })
+    }
+
 
     return (
-        <Layout title='Algun pokemon'>
+        <Layout title={pokemon.name}>
             <Grid.Container css={{ marginTop: '5px' }} gap={2}>
                 <Grid xs={12} sm={4}>
                     <Card isHoverable css={{ padding: '30px' }}>
@@ -30,8 +51,8 @@ export const PokemonPage: NextPage<Props> = ({ pokemon }) => {
                     <Card>
                         <Card.Header css={{ display: 'flex', justifyContent: 'space-between' }}>
                             <Text h1 transform='capitalize'>{pokemon.name}</Text>
-                            <Button color="gradient" ghost>
-                                Guardar en Favoritos
+                            <Button color="gradient" ghost={!isInFavorites} onClick={onToggleFavorite}>
+                                {isInFavorites ? 'En favoritos' : 'Guardar en favoritos'}
                             </Button>
                         </Card.Header>
 
@@ -39,17 +60,17 @@ export const PokemonPage: NextPage<Props> = ({ pokemon }) => {
                             <Text size={30}>Sprites:</Text>
                             <Container direction='row' display='flex'>
                                 <Image src={pokemon.sprites.front_default}
-                                alt={pokemon.name}
-                                width={100}
-                                height={100}/>
-                                  <Image src={pokemon.sprites.back_default}
-                                alt={pokemon.name}
-                                width={100}
-                                height={100}/>
-                                  <Image src={pokemon.sprites.front_shiny}
-                                alt={pokemon.name}
-                                width={100}
-                                height={100}/>
+                                    alt={pokemon.name}
+                                    width={100}
+                                    height={100} />
+                                <Image src={pokemon.sprites.back_default}
+                                    alt={pokemon.name}
+                                    width={100}
+                                    height={100} />
+                                <Image src={pokemon.sprites.front_shiny}
+                                    alt={pokemon.name}
+                                    width={100}
+                                    height={100} />
                             </Container>
                         </Card.Body>
                     </Card>
@@ -64,11 +85,11 @@ export const PokemonPage: NextPage<Props> = ({ pokemon }) => {
 export const getStaticPaths: GetStaticPaths = async (ctx) => {
 
 
-    const pokemones  = [...Array(151)].map((value, index) =>`${index + 1}`);
+    const pokemones = [...Array(151)].map((value, index) => `${index + 1}`);
 
     return {
         paths: pokemones.map(id => ({
-            params: { id : id }
+            params: { id: id }
         })),
         fallback: false
     }

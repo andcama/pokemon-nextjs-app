@@ -22,23 +22,14 @@ export const NavBar = () => {
                 width={70}
                 height={70} />
 
-
             <Link href="/">
-
                 <Text color="white" h2>P</Text>
                 <Text color="white" h3>okemon</Text>
-
             </Link>
-
-
             <Spacer css={{ flex: 1 }} />
-
-
-
             <Link href="/favorites" css={{ marginRight: '10px' }}>
 
                 <Text color="white" >Favoritos</Text>
-
             </Link>
 
         </div>
